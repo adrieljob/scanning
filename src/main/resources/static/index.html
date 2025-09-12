@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foccus Digital-Login</title>
+    <link rel="icon" href="../../../../../scanning/src/main/resources/static/logo/icon.png" type="image/png">
+    <style>
+        body {
+            background-color: #222;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .login-box {
+            background-color: #333;
+            padding: 30px;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0 0 10px #000;
+            text-align: center;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-box button:hover {
+            background-color: #cc0000;
+        }
+
+        .logo {
+            width: 300px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        #loginError {
+            color: red;
+            display: none;
+            margin-top: 10px;
+        }
+
+        label {
+            display: inline-flex; /* Muda para inline-flex para manter na mesma linha */
+            align-items: center; /* Alinha verticalmente */
+            margin-bottom: 10px; /* Mantém a margem inferior */
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <img src="logo/logo.png" alt="Logo" class="logo">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Usuário">
+    <input type="password" id="password" placeholder="Senha">
+    <label><input type="checkbox" id="rememberMe"> Lembrar login</label>
+    <button onclick="login()">Entrar</button>
+    <p id="loginError">Usuário ou senha inválidos</p>
+</div>
+
+<script>
+    window.onload = function () {
+        const savedUser  = localStorage.getItem("savedUser ");
+        const savedPass = localStorage.getItem("savedPass");
+
+        if (savedUser  && savedPass) {
+            document.getElementById("username").value = savedUser ;
+            document.getElementById("password").value = savedPass;
+            document.getElementById("rememberMe").checked = true;
+        }
+    };
+
+    function login() {
+        const user = document.getElementById("username").value;
+        const pass = document.getElementById("password").value;
+        const remember = document.getElementById("rememberMe").checked;
+
+        if (user === "Admin" && pass === "Admin") {
+            if (remember) {7070
+                localStorage.setItem("savedUser ", user);
+                localStorage.setItem("savedPass", pass);
+            } else {
+                localStorage.removeItem("savedUser ");
+                localStorage.removeItem("savedPass");
+            }
+
+            // Redireciona para a página principal
+            window.location.href = "pagina_inicial_2.html";
+        } else {
+            document.getElementById("loginError").style.display = "block";
+        }
+    }
+
+</script>
+
+</body>
+</html>
