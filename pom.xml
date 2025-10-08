@@ -64,17 +64,16 @@
         </dependency>
 
         <!-- JPA e PostgreSQL (COMENTADOS: Desabilita DB se não precisar agora. Descomente para ativar) -->
-        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-        -->
 
         <!-- Jackson (REMOVIDO: Já incluso no spring-boot-starter-web. Adicione só se precisar de versão específica) -->
     </dependencies>
