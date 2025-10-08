@@ -1,4 +1,3 @@
-<!--
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -29,16 +28,23 @@
         }
 
         /* ===== Sidebar cidades ===== */
-        #lista-cidades {
-          list-style: none;
-          padding: 0;
-          margin: 0;
+        #sidebar-container {
           width: 220px;
           border-right: 2px solid #444;
           background: #1f1f1f;
           transition: width 0.3s ease;
           overflow: hidden;
           position: relative;
+          display: flex;
+          flex-direction: column;
+        }
+
+        #lista-cidades {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          flex: 1;
+          overflow-y: auto;
         }
 
         #lista-cidades li {
@@ -59,6 +65,20 @@
           font-weight: bold;
         }
 
+        #lista-cidades li.hidden {
+          display: none; /* Para esconder cidades que não correspondem à pesquisa */
+        }
+
+        #lista-cidades li.no-results {
+          display: block !important;
+          background: #ff002b;
+          text-align: center;
+          cursor: default;
+          color: #fff;
+          font-style: italic;
+          padding: 20px;
+        }
+
         /* Botão retrátil */
         .toggle-btn {
           position: absolute;
@@ -72,24 +92,28 @@
           color: white;
           cursor: pointer;
           transition: transform 0.3s;
+          z-index: 10;
         }
 
-        #lista-cidades.colapsado {
+        #sidebar-container.colapsado {
           width: 50px;
         }
 
-        #lista-cidades.colapsado li {
+        #sidebar-container.colapsado #lista-cidades li {
           text-align: center;
           padding: 15px 0;
         }
 
-        #lista-cidades.colapsado li::after {
-          content: "•";
-          color: #fff;
-          font-size: 18px;
+        #sidebar-container.colapsado #lista-cidades li span {
+          display: none;
         }
 
-        #lista-cidades.colapsado li span {
+        #sidebar-container.colapsado .search-container {
+          width: 50px;
+          padding: 10px 0;
+        }
+
+        #sidebar-container.colapsado #search-input {
           display: none;
         }
 
@@ -168,6 +192,143 @@
         .tx-ok { background-color: #2c2c2c; }
         .tx-warning { background-color: #ffd400; color: black; }
 
+        /* ===== NOVA SEÇÃO PARA VARREDURAGERAL (MTX) ===== */
+        #varredura-section {
+          margin-top: 30px;
+          padding: 20px;
+          background: #1f1f1f;
+          border-radius: 12px;
+          border: 1px solid #444;
+          display: none; /* Inicialmente oculta */
+        }
+
+        #varredura-section h2 {
+          color: #ff0831;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        .accordion {
+          margin-bottom: 15px;
+        }
+
+        .accordion-header {
+          background: #333;
+          padding: 12px;
+          cursor: pointer;
+          border-radius: 8px;
+          font-weight: bold;
+          transition: background 0.2s;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .accordion-header:hover {
+          background: #444;
+        }
+
+        .accordion-header.active {
+          background: #cc0022;
+        }
+
+        .accordion-content {
+          display: none;
+          padding: 15px;
+          background: #2c2c2c;
+          border-radius: 8px;
+          margin-top: 5px;
+        }
+
+        .accordion-content.active {
+          display: block;
+        }
+
+        .status-normal { color: #00ff00; } /* Verde */
+        .status-alarm { color: #ffd400; } /* Amarelo */
+        .status-error { color: #ff002b; } /* Vermelho */
+        .status-disabled { color: #888; } /* Cinza */
+        .status-unknown { color: #888; } /* Cinza */
+
+        .sub-card {
+          background: #333;
+          padding: 10px;
+          margin: 10px 0;
+          border-radius: 6px;
+          border-left: 4px solid #ff0831;
+        }
+
+        .sub-card h5 {
+          margin: 0 0 8px;
+          color: #ff0831;
+        }
+
+        ul {
+          list-style-type: none;
+          padding: 0;
+        }
+
+        li {
+          padding: 5px 0;
+          border-bottom: 1px solid #444;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        .loading {
+          text-align: center;
+          color: #ffffff;
+          font-style: italic;
+        }
+
+        /* ===== ESTILOS PARA A BARRA DE PESQUISA ===== */
+        .search-container {
+          padding: 10px;
+          background: #1f1f1f;
+          border-bottom: 1px solid #444;
+          position: relative;
+        }
+
+        #search-input {
+          width: 100%;
+          padding: 10px 12px 10px 35px; /* Espaço para ícone de lupa */
+          background: #2c2c2c;
+          border: 1px solid #444;
+          border-radius: 6px;
+          color: #fff;
+          font-size: 14px;
+          box-sizing: border-box;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+
+        #search-input:focus {
+          border-color: #cc0022;
+        }
+
+        #search-input::placeholder {
+          color: #888;
+        }
+
+        .search-icon {
+          position: absolute;
+          left: 25px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #888;
+          font-size: 16px;
+          pointer-events: none;
+        }
+
+        .no-results-message {
+          display: none;
+          text-align: center;
+          padding: 20px;
+          color: #ff002b;
+          font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -178,7 +339,15 @@
 </header>
 
 <main>
-    <ul id="lista-cidades">
+    <!-- NOVA BARRA DE PESQUISA NA SIDEBAR -->
+    <div id="sidebar-container">
+        <div class="search-container">
+            <span class="search-icon">🔍</span> <!-- Ícone de lupa simples -->
+            <input type="search" id="search-input" placeholder="Pesquisar cidade (ex: Cafeara, PR, Rio...)" />
+            <div id="no-results-message" class="no-results-message">Nenhuma cidade encontrada. Tente outra busca.</div>
+        </div>
+        <ul id="lista-cidades">
+            <!-- SUA LISTA DE CIDADES ORIGINAL VAI AQUI. EX: -->
             <li data-id="885"><span>PR - Capanema</span></li>
             <li data-id="1312"><span>PR - Cafeara</span></li>
             <li data-id="1432"><span>PR - Siqueira Campos</span></li>
@@ -191,7 +360,6 @@
             <li data-id="410"><span>PR - Campina da Lagoa</span></li>
             <li data-id="1464"><span>BA - Gloria</span></li>
             <li data-id="411"><span>PR - Campo Bonito</span></li>
-            <li data-id="885"><span>PR - Capanema</span></li>
             <li data-id="298"><span>AL - Agua Branca</span></li>
             <li data-id="288"><span>PE - Orobo</span></li>
             <li data-id="1339"><span>PR - Boa Ventura de Sao Roque</span></li>
@@ -394,18 +562,25 @@
             <li data-id="315"><span>PE - Tacaimbo</span></li>
             <li data-id="1298"><span>PE - Triunfo</span></li>
             <li data-id="1188"><span>ES - Conceicao do Castelo</span></li>
-
         </ul>
+    </div>
 
-        <div class="conteudo">
+    <div class="conteudo">
         <div class="cidade-info" id="cidade-info">Escolha uma cidade...</div>
         <div class="panel">
             <div class="tx-grid" id="tx-grid"></div>
+        </div>
+
+        <!-- NOVA SEÇÃO PARA DADOS DA VARREDURAGERAL (MTX) -->
+        <div id="varredura-section">
+            <h2>Informações do Transmissor (MTX)</h2>
+            <div id="varredura-content" class="loading">Carregando dados do MTX...</div>
         </div>
     </div>
 </main>
 
 <script>
+    // Função para renderizar dados do Nemesys (já existente, mantida igual)
     function renderTXs(data) {
       const cidadeInfo = document.getElementById('cidade-info');
       const grid = document.getElementById('tx-grid');
@@ -468,45 +643,333 @@
 
           grid.appendChild(txContainer);
       });
-  }
+    }
 
-  document.querySelectorAll('#lista-cidades li').forEach(li => {
-      li.addEventListener('click', () => {
-          document.querySelectorAll('#lista-cidades li').forEach(el => el.classList.remove('active'));
-          li.classList.add('active');
-          const cidadeId = li.getAttribute('data-id');
+    // Função auxiliar para determinar a classe de status
+    function getStatusClass(status) {
+        if (!status) return 'status-unknown';
+        status = status.toLowerCase();
+        if (status.includes('erro') || status.includes('fault')) return 'status-error';
+        if (status.includes('alarme') || status.includes('warning')) return 'status-alarm';
+        if (status.includes('normal') || status.includes('enable') || status.includes('ok') || status.includes('running')) return 'status-normal';
+        if (status.includes('desabilitado') || status.includes('disabled') || status.includes('off')) return 'status-disabled';
+        return 'status-unknown';
+    }
 
-          fetch(`/api/dashboard/${cidadeId}`)
-              .then(res => res.json())
-              .then(data => renderTXs(data))
-              .catch(err => {
-                  console.error(err);
-                  alert("Erro ao buscar dados da cidade");
-              });
-      });
-  });
+    // NOVA FUNÇÃO: Renderiza os dados da varreduraGeral (MTX)
+    function renderVarredura(data) {
+        const section = document.getElementById('varredura-section');
+        const content = document.getElementById('varredura-content');
 
-  // Toggle sidebar
-  const listaCidades = document.getElementById("lista-cidades");
-  const toggleBtn = document.querySelector(".toggle-btn");
-  toggleBtn.onclick = () => {
-      listaCidades.classList.toggle("colapsado");
-      toggleBtn.textContent = listaCidades.classList.contains("colapsado") ? "" : "";
-  };
+        // Limpa o conteúdo anterior e mostra a seção
+        content.innerHTML = '';
+        section.style.display = 'block';
 
-  function atualizarDataHora() {
-      const agora = new Date();
-      const dataFormatada = agora.toLocaleDateString('pt-BR');
-      const horaFormatada = agora.toLocaleTimeString('pt-BR');
-      const dateTimeElem = document.getElementById('dateTime');
-      if (dateTimeElem) {
-          dateTimeElem.textContent = `${dataFormatada} ${horaFormatada}`;
-      }
-  }
+        if (data.status !== "Consulta executada com sucesso") {
+            content.innerHTML = `<p style="color: #ff002b; text-align: center;">Erro na coleta de dados MTX: ${data.erro || 'Desconhecido'}</p>`;
+            return;
+        }
 
-  setInterval(atualizarDataHora, 1000);
+        let html = '';
+
+        // Resumo Geral
+        html += `
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>Resumo Geral</span>
+                    <span>▼</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="sub-card">
+                        <h5>Total de TXs Habilitadas:</h5>
+                        <p class="${getStatusClass(data.TotalTXsEnabled > 0 ? 'normal' : 'disabled')}">${data.TotalTXsEnabled || 0} de 8</p>
+                    </div>
+                    <div class="sub-card">
+                        <h5>Serial Number do Equipamento:</h5>
+                        <p>${data.SerialNumber || 'N/A'}</p>
+                    </div>
+                    <div class="sub-card">
+                        <h5>Transmitters (IDs Seriais):</h5>
+                        <ul>
+                            ${data.Transmitters ? data.Transmitters.map(tx => `<li>${tx.TX}: ${tx.Serial || 'N/A'}</li>`).join('') : '<li>N/A</li>'}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Status das Boards
+        html += `
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>Status das Boards (TXs)</span>
+                    <span>▼</span>
+                </div>
+                <div class="accordion-content">
+                    <ul>
+                        ${data.BoardsStatus ? data.BoardsStatus.map(board =>
+                            `<li class="${getStatusClass(board.Status)}">
+                                ${board.TX}: ${board.Status || 'Unknown'}
+                            </li>`
+                        ).join('') : '<li>Nenhum dado</li>'}
+                    </ul>
+                </div>
+            </div>
+        `;
+
+        // ALC Status por TX
+        html += `
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>ALC Status por TX</span>
+                    <span>▼</span>
+                </div>
+                <div class="accordion-content">
+                    <ul>
+                        ${Object.entries(data.alcStatusPorTx || {}).map(([tx, status]) =>
+                            `<li class="${getStatusClass(status)}">
+                                ${tx}: ${status || 'N/A'}
+                            </li>`
+                        ).join('')}
+                    </ul>
+                </div>
+            </div>
+        `;
+
+        // Alarmes Common
+        html += `
+            <div class="accordion">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <span>Alarmes Common (${data.Common ? data.Common.length : 0})</span>
+                    <span>▼</span>
+                </div>
+                <div class="accordion-content">
+                    <ul>
+                        ${data.Common ? data.Common.map(alarm =>
+                            `<li class="${getStatusClass(alarm.statusInterpretado)}">
+                                ${alarm.nome}: ${alarm.statusInterpretado || 'Unknown'}
+                            </li>`
+                        ).join('') : '<li>Nenhum alarme</li>'}
+                    </ul>
+                </div>
+            </div>
+        `;
+
+        // Dados por TX (Taxas, PIDs, Cooling, ALC, Alarmes ALC)
+        if (data.DadosTXs) {
+            Object.entries(data.DadosTXs).forEach(([txKey, txData]) => {
+                // Só para TXs processadas ou com dados relevantes
+                if (txData && txData.alcStatus !== "Não processada" && txData.alcStatus !== "Erro geral no TX") {
+                    html += `
+                        <div class="accordion">
+                            <div class="accordion-header" onclick="toggleAccordion(this)">
+                                <span>${txKey} - Dados Detalhados</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="sub-card">
+                                    <h5>Taxas de Entrada:</h5>
+                                    <ul>
+                                        <li>ETH: ${txData.TaxasEntrada?.taxa_ETH || 'N/A'}</li>
+                                        <li>ASI: ${txData.TaxasEntrada?.taxa_ASI || 'N/A'}</li>
+                                    </ul>
+                                </div>
+                                <div class="sub-card">
+                                    <h5>PIDs:</h5>
+                                    <p>TS ID: ${txData.PIDs?.tsId || 'N/A'}</p>
+                                    <p>Status: ${txData.PIDs?.status || 'N/A'}</p>
+                                    <h6>Programas:</h6>
+                                    <ul>
+                                        ${txData.PIDs?.programas && txData.PIDs.programas.length > 0 ?
+                                            txData.PIDs.programas.map(prog => `<li>${prog.programa} (PIDs: ${prog.pids})</li>`).join('') :
+                                            '<li>Nenhum programa encontrado</li>'}
+                                    </ul>
+                                </div>
+                                <div class="sub-card">
+                                    <h5>Cooling Status:</h5>
+                                    <p class="${getStatusClass(txData.CoolingStatus)}">${txData.CoolingStatus || 'N/A'}</p>
+                                </div>
+                                <div class="sub-card">
+                                    <h5>ALC Status:</h5>
+                                    <p class="${getStatusClass(txData.alcStatus)}">${txData.alcStatus || 'N/A'}</p>
+                                </div>
+                                <div class="sub-card">
+                                    <h5>Alarmes ALC:</h5>
+                                    <ul>
+                                        ${txData.alarmesAlc ? Object.entries(txData.alarmesAlc).map(([alarmName, alarmInfo]) => `
+                                            <li class="${getStatusClass(alarmInfo.status)}">
+                                                ${alarmName} Status: ${alarmInfo.status || 'N/A'}
+                                                ${alarmInfo.value ? ` (Valor: ${alarmInfo.value})` : ''}
+                                            </li>
+                                        `).join('') : '<li>Nenhum alarme ALC</li>'}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Alarmes Modulator
+        if (data.AlarmesModulator) {
+            Object.entries(data.AlarmesModulator).forEach(([txKey, modulatorData]) => {
+                if (modulatorData && modulatorData.status !== "TX não habilitada") {
+                    html += `
+                        <div class="accordion">
+                            <div class="accordion-header" onclick="toggleAccordion(this)">
+                                <span>${txKey} - Alarmes do Modulador</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <div class="sub-card">
+                                    <h5>Video Lock:</h5>
+                                    <p class="${getStatusClass(modulatorData['Video Lock'])}">${modulatorData['Video Lock'] || 'N/A'}</p>
+                                </div>
+                                <div class="sub-card">
+                                    <h5>Video White Clipping:</h5>
+                                    <p class="${getStatusClass(modulatorData['Video White Clipping'])}">${modulatorData['Video White Clipping'] || 'N/A'}</p>
+                                </div>
+                                <div class="sub-card">
+                                    <h5>Audio Saturation:</h5>
+                                    <p class="${getStatusClass(modulatorData['Audio Saturation'])}">${modulatorData['Audio Saturation'] || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Alarmes por TX (abas TX1 a TX8)
+        if (data.TXs) {
+            Object.entries(data.TXs).forEach(([txAba, alarmes]) => {
+                // Só mostra se houver alarmes ou se a TX foi processada (mesmo que vazia)
+                if (alarmes && alarmes.length > 0) {
+                    html += `
+                        <div class="accordion">
+                            <div class="accordion-header" onclick="toggleAccordion(this)">
+                                <span>${txAba} - Alarmes Específicos (${alarmes.length})</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="accordion-content">
+                                <ul>
+                                    ${alarmes.map(alarm => `
+                                        <li class="${getStatusClass(alarm.statusInterpretado)}">
+                                            ${alarm.nome}: ${alarm.statusInterpretado || 'Unknown'}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        content.innerHTML = html;
+    }
+
+    // Lógica para expandir/colapsar accordions
+    function toggleAccordion(header) {
+        header.classList.toggle('active');
+        const content = header.nextElementSibling;
+        if (content.style.display === "block") {
+            content.style.display = "none";
+            header.querySelector('span:last-child').innerText = '▼';
+        } else {
+            content.style.display = "block";
+            header.querySelector('span:last-child').innerText = '▲';
+        }
+    }
+
+    // NOVA LÓGICA DE PESQUISA
+    const searchInput = document.getElementById('search-input');
+    const listaCidadesUl = document.getElementById('lista-cidades');
+    const cidadesLi = Array.from(listaCidadesUl.getElementsByTagName('li')); // Converte para Array para facilitar a manipulação
+    const noResultsMessage = document.getElementById('no-results-message');
+
+    searchInput.addEventListener('keyup', filtrarCidades);
+
+    function filtrarCidades() {
+        const searchTerm = searchInput.value.toLowerCase();
+        let foundResults = 0;
+
+        cidadesLi.forEach(li => {
+            const cityName = li.textContent.toLowerCase();
+            if (cityName.includes(searchTerm)) {
+                li.classList.remove('hidden');
+                foundResults++;
+            } else {
+                li.classList.add('hidden');
+            }
+        });
+
+        if (foundResults === 0 && searchTerm.length > 0) {
+            noResultsMessage.style.display = 'block';
+        } else {
+            noResultsMessage.style.display = 'none';
+        }
+    }
+
+    // Event Listeners para as cidades
+    cidadesLi.forEach(li => {
+        li.addEventListener('click', () => {
+            document.querySelectorAll('#lista-cidades li').forEach(el => el.classList.remove('active'));
+            li.classList.add('active');
+            const cidadeId = li.getAttribute('data-id');
+            const cidadeNome = li.querySelector('span').textContent;
+
+            // Limpa e mostra mensagem de carregamento para a seção Nemesys
+            document.getElementById('tx-grid').innerHTML = '<p class="loading">Carregando dados do Nemesys...</p>';
+            document.getElementById('cidade-info').innerText = `Carregando dados para ${cidadeNome}...`;
+
+            // Limpa e mostra mensagem de carregamento para a seção VarreduraGeral
+            const varreduraSection = document.getElementById('varredura-section');
+            const varreduraContent = document.getElementById('varredura-content');
+            varreduraContent.innerHTML = '<p class="loading">Carregando dados do MTX...</p>';
+            varreduraSection.style.display = 'block'; // Garante que a seção esteja visível
+
+            // Fetch para o dashboard Nemesys
+            fetch(`/api/dashboard/${cidadeId}`)
+                .then(res => res.json())
+                .then(data => renderTXs(data))
+                .catch(err => {
+                    console.error("Erro ao buscar dados do Nemesys:", err);
+                    document.getElementById('tx-grid').innerHTML = `<p style="color: #ff002b; text-align: center;">Erro ao carregar dados do Nemesys: ${err.message}</p>`;
+                });
+
+            // Fetch para varreduraGeral (MTX) com delay
+            setTimeout(() => {
+                fetch('/varredurageral?cidade=' + encodeURIComponent(cidadeNome))
+                    .then(resp => {
+                        if (!resp.ok) throw new Error('Erro na requisição varreduraGeral: ' + resp.status);
+                        return resp.json();
+                    })
+                    .then(data => {
+                        console.log("Resultado da varreduraGeral:", data);
+                        renderVarredura(data);
+                    })
+                    .catch(err => {
+                        console.error('Erro na varreduraGeral: ' + err.message);
+                        document.getElementById('varredura-content').innerHTML = `<p style="color: #ff002b; text-align: center;">Erro ao carregar dados do MTX: ${err.message}</p>`;
+                    });
+            }, 2000); // Delay de 2 segundos
+        });
+    });
+
+    function atualizarDataHora() {
+        const agora = new Date();
+        const dataFormatada = agora.toLocaleDateString('pt-BR');
+        const horaFormatada = agora.toLocaleTimeString('pt-BR');
+        const dateTimeElem = document.getElementById('dateTime');
+        if (dateTimeElem) {
+            dateTimeElem.textContent = `${dataFormatada} ${horaFormatada}`;
+        }
+    }
+
+    setInterval(atualizarDataHora, 1000);
+    atualizarDataHora(); // Chama a função uma vez para exibir a data/hora imediatamente
 </script>
-
 </body>
 </html>
--->
