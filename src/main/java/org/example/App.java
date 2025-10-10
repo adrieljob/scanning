@@ -1,8 +1,11 @@
 package org.example;
 
+import net.bytebuddy.utility.privilege.GetMethodAction;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 // Adicione @ComponentScan se seus controladores e serviços não estiverem no mesmo pacote ou subpacotes de App.java

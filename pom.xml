@@ -75,6 +75,7 @@
             <scope>runtime</scope>
         </dependency>
 
+
         <!-- Jackson (REMOVIDO: Já incluso no spring-boot-starter-web. Adicione só se precisar de versão específica) -->
     </dependencies>
 
