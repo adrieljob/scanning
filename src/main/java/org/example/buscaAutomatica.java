@@ -865,6 +865,7 @@ public class buscaAutomatica {
 
             // 4. Pegar o estado do ALC
             WebElement ethDiv = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("pa_stat_alc_stat")));
+            Thread.sleep(1500);
             String ethValue = ethDiv.getText();
 
             // Coloca os valores no resultado para retornar
@@ -890,6 +891,110 @@ public class buscaAutomatica {
         }
     }
 
+    @GetMapping("/funcaoModulator")
+    public String funcaoModulator(@RequestParam(name = "cidade", required = false) String cidade) {
+        System.out.println("=== /funcaoModulator chamado ===");
+        System.out.println("Cidade recebida: " + cidade);
+
+        if (cidade == null || cidade.isEmpty()) {
+            cidade = "29"; // valor padrão
+            System.out.println("Cidade não informada, usando padrão: " + cidade);
+        }
+
+        String urlBase = "http://172.17.10." + cidade + ":10251/login.html";
+        System.out.println("URL que será acessada: " + urlBase);
+
+        WebDriverManager.chromedriver().setup();
+
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-extensions");
+        options.addArguments("--disable-gpu");
+        //options.addArguments("--headless"); // descomente para rodar sem abrir navegador
+        options.addArguments("--incognito");
+        options.addArguments("--disable-cache");
+
+        WebDriver driver = new ChromeDriver(options);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(40));
+
+        Map<String, Object> resultado = new HashMap<>();
+
+        try {
+            driver.get(urlBase);
+            driver.manage().window().maximize();
+
+            // Login
+            WebElement campoUsuario = wait.until(ExpectedConditions.elementToBeClickable(By.id("hrs_login_user")));
+            campoUsuario.clear();
+            campoUsuario.sendKeys("factory");
+
+            WebElement campoSenha = wait.until(ExpectedConditions.elementToBeClickable(By.id("hrs_login_pw")));
+            campoSenha.clear();
+            campoSenha.sendKeys("f@ct0ry");
+
+            WebElement botaoLogin = wait.until(ExpectedConditions.elementToBeClickable(By.id("hrs_login_loginBtn")));
+            botaoLogin.click();
+
+            wait.until(ExpectedConditions.urlContains("mainPage.html"));
+
+            // 1. Clicar em "Go To"
+            WebElement goToBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.cssSelector("a.btn60x22.link_btn[onclick*='modBtnClick(2)']")));
+            goToBtn.click();
+            Thread.sleep(1500);
+
+            // 2. Clicar em "Exciter"
+            WebElement exciterDiv = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div#h_exciter")));
+            exciterDiv.click();
+            Thread.sleep(1500);
+
+            // 3. Clicar em "ISDB-T Modulator"
+            WebElement modulatorLink = wait.until(ExpectedConditions.elementToBeClickable(By.id("estatus_modulator")));
+            modulatorLink.click();
+            Thread.sleep(1500);
+
+            // 4. Clicar em "IsdbT Config"
+            WebElement configLink = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//a[contains(@class,'btn120_default') and contains(text(),'IsdbT Config')]")));
+            configLink.click();
+            Thread.sleep(1500);
+
+            // 5. Alterar o select "Input Mode" para value "3"
+            WebElement inputModeSelect = wait.until(ExpectedConditions.elementToBeClickable(By.id("isdbt_mode")));
+            Select select = new Select(inputModeSelect);
+
+            select.selectByValue("3");
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].dispatchEvent(new Event('change', { bubbles: true }));", inputModeSelect);
+            Thread.sleep(1500);
+
+            // 6. Alterar o select "Input Mode" para value "2" , volta para a configuração de REMUX
+            select.selectByValue("2");
+            js.executeScript("arguments[0].dispatchEvent(new Event('change', { bubbles: true }));", inputModeSelect);
+            Thread.sleep(1500);
+
+            resultado.put("status", "Sequência executada com sucesso");
+            resultado.put("inputModeAlterado", "Valor 3 (Async BTS) selecionado e depois voltou para 2 (Remux)");
+
+        } catch (Exception e) {
+            System.err.println("Erro no /funcaoRemux: " + e.toString());
+            resultado.put("status", "Erro ao executar sequência");
+            resultado.put("erro", e.toString());
+        } finally {
+            driver.quit();
+            System.out.println("Driver finalizado no /funcaoRemux");
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            return mapper.writeValueAsString(resultado);
+        } catch (Exception e) {
+            System.err.println("Erro ao gerar JSON no /funcaoRemux: " + e.toString());
+            return "{\"erro\":\"Falha ao gerar JSON\"}";
+        }
+    }
 
     private String extrairParametroSess(String url) {
         try {
