@@ -305,7 +305,6 @@ public class BuscaAutomaticaController { // Renomeado de buscaAutomatica_orgn
 
         return ipMapeamento.getOrDefault(idCidade, "172.17.10.1"); // Valor padrão caso não encontre
     }
-
     private String processarParametroCidade(String cidade) {
         if (cidade == null || cidade.isEmpty()) {
             return "0";
@@ -842,7 +841,7 @@ public class BuscaAutomaticaController { // Renomeado de buscaAutomatica_orgn
                     WebElement abaBtn = wait.until(ExpectedConditions.elementToBeClickable(
                             By.xpath("//div[contains(@class,'navAreaBtn') and text()='" + aba + "']")));
                     abaBtn.click();
-                    Thread.sleep(2000);
+                    Thread.sleep(5000);
                     System.out.println("Clicado na aba '" + aba + "'.");
 
                     List<Map<String, String>> alarmes = buscarAlarmesTx(driver, wait);
@@ -1388,7 +1387,7 @@ public class BuscaAutomaticaController { // Renomeado de buscaAutomatica_orgn
 
         return resultado;
     }
-
+/*
     private Map<String, Map<String, String>> coletarAlarmesModulator(WebDriver driver, WebDriverWait wait, int numTxEnabled) throws InterruptedException {
         Map<String, Map<String, String>> modulatorStatusPorTx = new LinkedHashMap<>();
 
@@ -1426,47 +1425,64 @@ public class BuscaAutomaticaController { // Renomeado de buscaAutomatica_orgn
                 Thread.sleep(2000);
                 System.out.println("Clicado em 'Modulator' para " + txKey);
 
-                // 5. Aguarda o container #analog_alarms carregar e extrai os 3 alarmes
+                // 5. Aguarda o container #analog_alarms carregar e extrai os 4 alarmes
                 WebElement analogAlarmsContainer = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("analog_alarms")));
-                System.out.println("Container 'analog_alarms' encontrado para " + txKey);
+                System.out.println("Container 'isdbt_alrms' encontrado para " + txKey);
 
-                // Alarme 1: Video Lock
+                // Alarme 1: TS Presence
                 try {
-                    WebElement videoLockLed = analogAlarmsContainer.findElement(By.id("analog_alarm_lock"));
-                    String videoLockClass = videoLockLed.getAttribute("class");
-                    String videoLockStatus = interpretarLedModClass(videoLockClass);
-                    alarmesTx.put("Video Lock", videoLockStatus);
-                    System.out.println(txKey + " - Video Lock: " + videoLockStatus);
+                    WebElement IIPBox = analogAlarmsContainer.findElement(By.id("isdbt_alrm_ts_presence_box"));
+                    WebElement TSPresenceLed = analogAlarmsContainer.findElement(By.id("isdbt_alrm_ts_presence"));
+                    String TSPresenceClass = TSPresenceLed.getAttribute("class");
+                    String TSPresenceStatus = interpretarLedModClass(TSPresenceClass);
+                    alarmesTx.put("TS Presence", TSPresenceStatus);
+                    System.out.println(txKey + " - TS Presence: " + TSPresenceStatus);
                 } catch (Exception e) {
-                    alarmesTx.put("Video Lock", "Erro: " + e.getMessage());
-                    statusLocal = "Aviso: Video Lock não encontrado";
-                    System.err.println(txKey + " - Erro ao coletar Video Lock: " + e.getMessage());
+                    alarmesTx.put("TS Presence", "Erro: " + e.getMessage());
+                    statusLocal = "Aviso: TS Presence não encontrado";
+                    System.err.println(txKey + " - Erro ao coletar TS Presence: " + e.getMessage());
                 }
 
-                // Alarme 2: Video White Clipping
+                // Alarme 2: Rate Overflow:
                 try {
-                    WebElement clippingLed = analogAlarmsContainer.findElement(By.id("analog_alarm_clipping"));
-                    String clippingClass = clippingLed.getAttribute("class");
-                    String clippingStatus = interpretarLedModClass(clippingClass);
-                    alarmesTx.put("Video White Clipping", clippingStatus);
-                    System.out.println(txKey + " - Video White Clipping: " + clippingStatus);
+                    WebElement IIPBox = analogAlarmsContainer.findElement(By.id("isdbt_alrm_rate_overflow_box"));
+                    WebElement RateOverflowLed = analogAlarmsContainer.findElement(By.id("isdbt_alrm_rate_overflow"));
+                    String RateOverflowClass = RateOverflowLed.getAttribute("class");
+                    String RateOverflowStatus = interpretarLedModClass(RateOverflowClass);
+                    alarmesTx.put("Rate Overflow", RateOverflowStatus);
+                    System.out.println(txKey + " - Rate Overflow: " + RateOverflowStatus);
                 } catch (Exception e) {
-                    alarmesTx.put("Video White Clipping", "Erro: " + e.getMessage());
-                    if (statusLocal.equals("Sucesso")) statusLocal = "Aviso: Clipping não encontrado";
-                    System.err.println(txKey + " - Erro ao coletar Video White Clipping: " + e.getMessage());
+                    alarmesTx.put("Rate Overflow", "Erro: " + e.getMessage());
+                    if (statusLocal.equals("Sucesso")) statusLocal = "Aviso: Rate Overflow não encontrado";
+                    System.err.println(txKey + " - Erro ao coletar Rate Overflow: " + e.getMessage());
                 }
 
-                // Alarme 3: Audio Saturation
+                // Alarme 3: IIP
                 try {
-                    WebElement saturationLed = analogAlarmsContainer.findElement(By.id("analog_alarm_saturation"));
-                    String saturationClass = saturationLed.getAttribute("class");
-                    String saturationStatus = interpretarLedModClass(saturationClass);
-                    alarmesTx.put("Audio Saturation", saturationStatus);
-                    System.out.println(txKey + " - Audio Saturation: " + saturationStatus);
+                    WebElement IIPBox = analogAlarmsContainer.findElement(By.id("isdbt_alrm_iip_box"));
+                    WebElement IIPLed = analogAlarmsContainer.findElement(By.id("isdbt_alrm_iip"));
+                    String IIPClass = IIPLed.getAttribute("class");
+                    String IIPStatus = interpretarLedModClass(IIPClass);
+                    alarmesTx.put("IIP", IIPStatus);
+                    System.out.println(txKey + " - IIP: " + IIPStatus);
                 } catch (Exception e) {
-                    alarmesTx.put("Audio Saturation", "Erro: " + e.getMessage());
-                    if (statusLocal.equals("Sucesso")) statusLocal = "Aviso: Saturation não encontrado";
-                    System.err.println(txKey + " - Erro ao coletar Audio Saturation: " + e.getMessage());
+                    alarmesTx.put("IIP", "Erro: " + e.getMessage());
+                    if (statusLocal.equals("Sucesso")) statusLocal = "Aviso: IIP não encontrado";
+                    System.err.println(txKey + " - Erro ao coletar IIP: " + e.getMessage());
+                }
+
+                // Alarme 4: Remux Tx Muting
+                try {
+                    WebElement IIPBox = analogAlarmsContainer.findElement(By.id("isdbt_alrm_remux_tx_mute_box"));
+                    WebElement RemuxTxMutingLed = analogAlarmsContainer.findElement(By.id("isdbt_alrm_remux_tx_mute"));
+                    String RemuxTxMutingClass = RemuxTxMutingLed.getAttribute("class");
+                    String RemuxTxMutingStatus = interpretarLedModClass(RemuxTxMutingClass);
+                    alarmesTx.put("Remux Tx Muting", RemuxTxMutingStatus);
+                    System.out.println(txKey + " - Remux Tx Muting: " + RemuxTxMutingStatus);
+                } catch (Exception e) {
+                    alarmesTx.put("Remux Tx Muting", "Erro: " + e.getMessage());
+                    if (statusLocal.equals("Sucesso")) statusLocal = "Aviso: Remux Tx Muting não encontrado";
+                    System.err.println(txKey + " - Erro ao coletar Remux Tx Muting: " + e.getMessage());
                 }
 
                 // Se todos vazios/erro, aviso geral
@@ -1477,15 +1493,17 @@ public class BuscaAutomaticaController { // Renomeado de buscaAutomatica_orgn
             } catch (TimeoutException e) {
                 System.err.println("Timeout ao coletar dados do Modulator para " + txKey + ": " + e.getMessage());
                 statusLocal = "Timeout - Painel Modulator não carregou";
-                alarmesTx.put("Video Lock", "Timeout");
-                alarmesTx.put("Video White Clipping", "Timeout");
-                alarmesTx.put("Audio Saturation", "Timeout");
+                alarmesTx.put("TS Presence", "Timeout");
+                alarmesTx.put("Rate Overflow", "Timeout");
+                alarmesTx.put("IIP", "Timeout");
+                alarmesTx.put("Remux Tx Muting", "Timeout");
             } catch (Exception e) {
                 System.err.println("Erro ao coletar dados do Modulator para " + txKey + ": " + e.toString());
                 statusLocal = "Erro: " + e.getMessage();
-                alarmesTx.put("Video Lock", "Erro geral");
-                alarmesTx.put("Video White Clipping", "Erro geral");
-                alarmesTx.put("Audio Saturation", "Erro geral");
+                alarmesTx.put("TS Presence", "Erro geral");
+                alarmesTx.put("Rate Overflow", "Erro geral");
+                alarmesTx.put("IIP", "Erro geral");
+                alarmesTx.put("Remux Tx Muting", "Erro geral");
             }
 
             // Adiciona status para debug (opcional)
@@ -1511,6 +1529,127 @@ public class BuscaAutomaticaController { // Renomeado de buscaAutomatica_orgn
 
         return modulatorStatusPorTx;
     }
+*/
+private Map<String, Map<String, String>> coletarAlarmesModulator(WebDriver driver, WebDriverWait wait, int numTxEnabled) {
+    Map<String, Map<String, String>> modulatorStatusPorTx = new LinkedHashMap<>();
+    for (int i = 1; i <= numTxEnabled; i++) {
+        String txKey = "TX" + i;
+        System.out.println("Coletando alarmes do Modulator para " + txKey);
+        Map<String, String> alarmesTx = new HashMap<>();
+        String statusLocal = "Sucesso";
+        try {
+            WebElement homeBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("firstMenu")));
+            homeBtn.click();
+            wait.until(ExpectedConditions.urlContains("mainPage.html"));
+            System.out.println("Navegado para Home para Modulator de " + txKey);
+            WebElement goToBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("a.btn60x22.link_btn[onclick*='modBtnClick(" + i + ")']")));
+            goToBtn.click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("h_exciter")));
+            System.out.println("Clicado em 'Go To' para Modulator de " + txKey);
+            WebElement exciterDiv = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("div#h_exciter")));
+            exciterDiv.click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("estatus_modulator")));
+            System.out.println("Clicado em 'Exciter' para Modulator de " + txKey);
+            WebElement modulatorLink = wait.until(ExpectedConditions.elementToBeClickable(By.id("estatus_modulator")));
+            modulatorLink.click();
+            WebElement analogAlarmsContainer = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("analog_alarms")));
+            System.out.println("Container 'analog_alarms' encontrado para " + txKey);
+
+            // Alarme 1: TS Presence
+            try {
+                WebElement TSPresenceLed = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("isdbt_alrm_ts_presence")));
+                String TSPresenceClass = TSPresenceLed.getAttribute("class");
+                String TSPresenceStatus = interpretarLedModClass(TSPresenceClass);
+                alarmesTx.put("TS Presence", TSPresenceStatus);
+                System.out.println(txKey + " - TS Presence: " + TSPresenceStatus);
+            } catch (org.openqa.selenium.NoSuchElementException e) {
+                alarmesTx.put("TS Presence", "Erro: Elemento não encontrado - " + e.getMessage());
+                statusLocal = "Aviso: TS Presence não encontrado";
+                System.err.println(txKey + " - Erro ao coletar TS Presence: " + e.getMessage());
+            } catch (Exception e) {
+                alarmesTx.put("TS Presence", "Erro: " + e.getMessage());
+                statusLocal = "Aviso: Erro em TS Presence";
+                System.err.println(txKey + " - Erro ao coletar TS Presence: " + e.getMessage());
+            }
+
+            // Alarme 2: Rate Overflow
+            try {
+                WebElement RateOverflowLed = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("isdbt_alrm_rate_overflow")));
+                String RateOverflowClass = RateOverflowLed.getAttribute("class");
+                String RateOverflowStatus = interpretarLedModClass(RateOverflowClass);
+                alarmesTx.put("Rate Overflow", RateOverflowStatus);
+                System.out.println(txKey + " - Rate Overflow: " + RateOverflowStatus);
+            } catch (org.openqa.selenium.NoSuchElementException e) {
+                alarmesTx.put("Rate Overflow", "Erro: Elemento não encontrado - " + e.getMessage());
+                statusLocal = "Aviso: Rate Overflow não encontrado";
+                System.err.println(txKey + " - Erro ao coletar Rate Overflow: " + e.getMessage());
+            } catch (Exception e) {
+                alarmesTx.put("Rate Overflow", "Erro: " + e.getMessage());
+                statusLocal = "Aviso: Erro em Rate Overflow";
+                System.err.println(txKey + " - Erro ao coletar Rate Overflow: " + e.getMessage());
+            }
+
+            // Alarme 3: IIP
+            try {
+                WebElement IIPLed = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("isdbt_alrm_iip")));
+                String IIPClass = IIPLed.getAttribute("class");
+                String IIPStatus = interpretarLedModClass(IIPClass);
+                alarmesTx.put("IIP", IIPStatus);
+                System.out.println(txKey + " - IIP: " + IIPStatus);
+            } catch (org.openqa.selenium.NoSuchElementException e) {
+                alarmesTx.put("IIP", "Erro: Elemento não encontrado - " + e.getMessage());
+                statusLocal = "Aviso: IIP não encontrado";
+                System.err.println(txKey + " - Erro ao coletar IIP: " + e.getMessage());
+            } catch (Exception e) {
+                alarmesTx.put("IIP", "Erro: " + e.getMessage());
+                statusLocal = "Aviso: Erro em IIP";
+                System.err.println(txKey + " - Erro ao coletar IIP: " + e.getMessage());
+            }
+
+            // Alarme 4: Remux Tx Muting
+            try {
+                WebElement RemuxTxMutingLed = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("isdbt_alrm_remux_tx_mute")));
+                String RemuxTxMutingClass = RemuxTxMutingLed.getAttribute("class");
+                String RemuxTxMutingStatus = interpretarLedModClass(RemuxTxMutingClass);
+                alarmesTx.put("Remux Tx Muting", RemuxTxMutingStatus);
+                System.out.println(txKey + " - Remux Tx Muting: " + RemuxTxMutingStatus);
+            } catch (org.openqa.selenium.NoSuchElementException e) {
+                alarmesTx.put("Remux Tx Muting", "Erro: Elemento não encontrado - " + e.getMessage());
+                statusLocal = "Aviso: Remux Tx Muting não encontrado";
+                System.err.println(txKey + " - Erro ao coletar Remux Tx Muting: " + e.getMessage());
+            } catch (Exception e) {
+                alarmesTx.put("Remux Tx Muting", "Erro: " + e.getMessage());
+                statusLocal = "Aviso: Erro em Remux Tx Muting";
+                System.err.println(txKey + " - Erro ao coletar Remux Tx Muting: " + e.getMessage());
+            }
+
+            if (alarmesTx.values().stream().allMatch(v -> v.startsWith("Erro") || v.isEmpty())) {
+                statusLocal = "Aviso: Nenhum alarme analógico encontrado";
+            }
+        } catch (TimeoutException e) {
+            System.err.println("Timeout ao coletar dados do Modulator para " + txKey + ": " + e.getMessage());
+            statusLocal = "Timeout";
+            // Adicione valores de erro
+        } catch (Exception e) {
+            System.err.println("Erro ao coletar dados do Modulator para " + txKey + ": " + e.getMessage());
+            statusLocal = "Erro geral";
+        }
+        alarmesTx.put("status", statusLocal);
+        modulatorStatusPorTx.put(txKey, alarmesTx);
+        System.out.println(txKey + " - Status Modulator: " + statusLocal);
+    }
+    for (int i = numTxEnabled + 1; i <= 8; i++) {
+        String txKey = "TX" + i;
+        Map<String, String> alarmesVazios = new HashMap<>();
+        alarmesVazios.put("TS Presence", "TX não habilitada");
+        alarmesVazios.put("Rate Overflow", "TX não habilitada");
+        alarmesVazios.put("IIP", "TX não habilitada");
+        alarmesVazios.put("Remux Tx Muting", "TX não habilitada");
+        alarmesVazios.put("status", "TX não habilitada");
+        modulatorStatusPorTx.put(txKey, alarmesVazios);
+    }
+    return modulatorStatusPorTx;
+}
 
     private List<Map<String, String>> buscarAlarmesCommon(WebDriver driver, WebDriverWait wait) {
         List<Map<String, String>> faults = new ArrayList<>();
@@ -1702,8 +1841,7 @@ public class BuscaAutomaticaController { // Renomeado de buscaAutomatica_orgn
         if (classe.contains("led16x16_fault")) return "Fault";
         if (classe.contains("led16x16_warn")) return "Warning";
         if (classe.contains("led16x16_disabled")) return "Disabled";
-        if (classe.contains("led16x16_ok")) return "Normal";
-        if (classe.contains("led16x16_default")) return "Default";
+        if (classe.contains("led16x16_default")) return "Normal";
         return "Unknown (" + classe + ")";
     }
 

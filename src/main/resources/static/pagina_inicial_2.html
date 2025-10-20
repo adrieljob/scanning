@@ -584,7 +584,8 @@
 </main>
 
 <script>
-    // Função para renderizar dados do Nemesys (já existente, mantida igual)
+    // Função para renderizar dados do Nemesys
+    // Inicio Nemesys
     function renderTXs(data) {
       const cidadeInfo = document.getElementById('cidade-info');
       const grid = document.getElementById('tx-grid');
@@ -648,6 +649,7 @@
           grid.appendChild(txContainer);
       });
     }
+    // Fim Nemesys
 
     // Função auxiliar para determinar a classe de status
     function getStatusClass(status) {
@@ -660,7 +662,8 @@
         return 'status-unknown';
     }
 
-    // NOVA FUNÇÃO: Renderiza os dados da varreduraGeral (MTX)
+    // Função para renderiza dados da varreduraGeral MTX
+    // Inicio MTX
     function renderVarredura(data) {
         const section = document.getElementById('varredura-section');
         const content = document.getElementById('varredura-content');
@@ -827,16 +830,20 @@
                             </div>
                             <div class="accordion-content">
                                 <div class="sub-card">
-                                    <h5>Video Lock:</h5>
-                                    <p class="${getStatusClass(modulatorData['Video Lock'])}">${modulatorData['Video Lock'] || 'N/A'}</p>
+                                    <h5>TS Presence:</h5>
+                                    <p class="${getStatusClass(modulatorData['TS Presence'])}">${modulatorData['TS Presence'] || 'N/A'}</p>
                                 </div>
                                 <div class="sub-card">
-                                    <h5>Video White Clipping:</h5>
-                                    <p class="${getStatusClass(modulatorData['Video White Clipping'])}">${modulatorData['Video White Clipping'] || 'N/A'}</p>
+                                    <h5>Rate Overflow:</h5>
+                                    <p class="${getStatusClass(modulatorData['Rate Overflow'])}">${modulatorData['Rate Overflow'] || 'N/A'}</p>
                                 </div>
                                 <div class="sub-card">
-                                    <h5>Audio Saturation:</h5>
-                                    <p class="${getStatusClass(modulatorData['Audio Saturation'])}">${modulatorData['Audio Saturation'] || 'N/A'}</p>
+                                    <h5>IIP:</h5>
+                                    <p class="${getStatusClass(modulatorData['IIP'])}">${modulatorData['IIP'] || 'N/A'}</p>
+                                </div>
+                                <div class="sub-card">
+                                    <h5>Remux Tx Muting:</h5>
+                                    <p class="${getStatusClass(modulatorData['Remux Tx Muting'])}">${modulatorData['Remux Tx Muting'] || 'N/A'}</p>
                                 </div>
                             </div>
                         </div>
@@ -873,6 +880,7 @@
 
         content.innerHTML = html;
     }
+    // Fim MTX
 
     // Lógica para expandir/colapsar accordions
     function toggleAccordion(header) {
@@ -887,7 +895,7 @@
         }
     }
 
-    // NOVA LÓGICA DE PESQUISA
+    // LÓGICA DE PESQUISA
     const searchInput = document.getElementById('search-input');
     const listaCidadesUl = document.getElementById('lista-cidades');
     const cidadesLi = Array.from(listaCidadesUl.getElementsByTagName('li')); // Converte para Array para facilitar a manipulação
